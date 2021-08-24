@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="UTF-8">
+
+
+  <title>Audio Website</title>
+  
+  
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css'>
+  
+<style>
+body {
+  font-family: sans-serif;
+}
+section {
+  padding: 40px;
+}
+.eazy-audio-player {
+  width: 180px;
+  text-align: center;
+  padding: 4px 12px;
+  border: 1px solid #dedede;
+  display:block;
+}
+.eazy-audio-player i {
+  display: inline-block;
+  color: #000;
+}
+
+.eazy-time {
+  vertical-align: top;
+  padding: 2px 4px 0 4px;
+  font-size: 12px;
+  color: #000;
+  display: inline-block;
+}
+
+.eazy-audio-player span {
+  display: inline-block;
+  min-width: 25px;
+}
+
+.eazy-seek {
+  display: inline-block;
+  width: 80px;
+  position: relative;
+  vertical-align: top;
+  margin-top: 4px;
+  height: 10px;
+}
+.eazy-seek_dot {
+  position: absolute;
+  z-index: 9;
+  top: 0px;
+  width: 9px;
+  height: 9px;
+  background-color: #000;
+  display: block;
+  border-radius: 50%;
+}
+.eazy-seek_bar {
+  position: absolute;
+  z-index: 1;
+  top: 3px;
+  width: 100%;
+  height: 2px;
+  background-color: #333;
+  display: block;
+}
+</style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+
+  
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+
+
+</head>
+
+<body translate="no">
+  <section>
+
+  <h2>Custom &lt;Audio&gt; Player</h2>
+  <ul>
+    <li>Easy CSS Styles</li>
+    <li>HTML5 Audio</li>
+    <li>Multiple Players in Page, just increase the numerical IDs</li>
+    <li>No External Libraries, except FontAwesome and jQuery</li>
+    <li>Looks for ready state</li>
+  </ul>
+
+  <audio style="display:none;" id="player2" src="static/media/audio/You Spin Me Round.mp3" type="audio/mpeg" preload="true" class=""></audio>
+  <div class="eazy-audio-wrapper">
+    <div class="eazy-audio-player">
+      <i class="fa eazy-play fa-play" data-id="2"></i>
+      <div class="eazy-time"><span id="curTime2">0:00</span> / <span id="maxTime2">0:00</span></div>
+      <div id="seek2" class="eazy-seek">
+        <div class="eazy-seek_dot" style="left: 0;"></div>
+        <div class="eazy-seek_bar"></div>
+      </div>
+    </div>
+  </div>
+  
+  <br><br>
+  
+  <audio style="display:none;" id="player3" src="static/media/audio/Windows XP Startup.mp3" type="audio/mpeg" preload="true" class=""></audio>
+  <div class="eazy-audio-wrapper">
+    <div class="eazy-audio-player">
+      <i class="fa eazy-play fa-play" data-id="3"></i>
+      <div class="eazy-time"><span id="curTime3">0:00</span> / <span id="maxTime3">0:00</span></div>
+      <div id="seek3" class="eazy-seek">
+        <div class="eazy-seek_dot" style="left: 0;"></div>
+        <div class="eazy-seek_bar"></div>
+      </div>
+    </div>
+  </div>
+  
+  <br><br>
+  
+  <a href="https://itunes.apple.com/us/album/the-arsonist-deluxe-edition/id738792215">Music By Billy Floyd</a>
+  
+</section>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-8216c69d01441f36c0ea791ae2d4469f0f8ff5326f00ae2d00e4bb7d20e24edb.js"></script>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+      <script id="rendered-js" >
+function fmtMSS(s) {
+  return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
+}
+
+function initAudioPlayer(player) {
+  //console.log(player);
+  if (player.readyState > 2) {
+    var i = player.id;
+    var playerId = i.replace(/(player)/gm, "");
+    var formatted_dur = "" + fmtMSS(player.duration) + "";
+    var dur = formatted_dur.slice(0, 4);
+    $("#maxTime" + playerId).html(dur);
+    $(player).removeClass("notready");
+  } else {
+    $(player).addClass("notready");
+  }
+}
+
+$(".eazy-play").on("click", function () {
+  var playerId = $(this).data("id");
+  var audioEl = $("body").find("#player" + playerId);
+
+  if ($(this).hasClass("fa-play")) {
+    $(this).toggleClass("fa-play fa-pause");
+    audioEl[0].play();
+    audioEl[0].addEventListener("timeupdate", function () {
+      var formatted_curTime = "" + fmtMSS(audioEl[0].currentTime) + "";
+      var curTime = formatted_curTime.slice(0, 4);
+      $("#curTime" + playerId).html(curTime);
+
+      var seekTime = parseInt(audioEl[0].currentTime, 10);
+      var seekPerc = parseInt(seekTime) / parseInt(audioEl[0].duration, 10) * 100;
+      $("#seek" + playerId + " .eazy-seek_dot").css("left", "" + seekPerc + "%");
+
+      if (audioEl[0].currentTime == audioEl[0].duration) {
+        $("#seek" + playerId + " .eazy-seek_dot").css("left", "0");
+        $('.eazy-play[data-id="' + playerId + '"]').toggleClass("fa-play fa-pause");
+      }
+    });
+  } else {
+    $(this).toggleClass("fa-play fa-pause");
+    audioEl[0].pause();
+  }
+});
+
+$(document).ready(function () {
+  var allPlayers = $("body").find("audio");
+  $.each(allPlayers, function (index, value) {
+    initAudioPlayer(this);
+  });
+
+  setTimeout(function () {
+    var notreadyPlayers = $("body").find("audio.notready");
+    $.each(notreadyPlayers, function (index, value) {
+      initAudioPlayer(this);
+    });
+  }, 3000);
+});
+    </script>
+
+  
+
+</body>
+
+</html>
